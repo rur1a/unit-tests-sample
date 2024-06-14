@@ -1,11 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class FactoryManager : MonoBehaviour {
+	private IInput Input => ServiceLocator.Input();
+	
 	public TextAsset mapData;
+
 	[Space(10)]
 	public Mesh wallMesh;
+
 	public Material wallMaterial;
 	public Material crafterPathMaterial;
 	public Material resourcePathMaterial;
@@ -14,8 +17,10 @@ public class FactoryManager : MonoBehaviour {
 
 	public static ToolType currentTool;
 
+
 	[System.NonSerialized]
 	public int mapWidth;
+
 	[System.NonSerialized]
 	public int mapHeight;
 
@@ -29,11 +34,14 @@ public class FactoryManager : MonoBehaviour {
 	List<Matrix4x4> crafterMatrices;
 	List<ResourceSpawner> resourceSpawners;
 	List<Matrix4x4> resourceSpawnerMatrices;
+
 	[System.NonSerialized]
 	public Transform factoryMarker;
+
 	BotManager botManager;
 	List<FlowField> flowFields;
 	int flowFieldTicker = 0;
+
 
 	[System.NonSerialized]
 	public FlowField resourceNavigator;
@@ -41,7 +49,7 @@ public class FactoryManager : MonoBehaviour {
 	Camera mainCam;
 
 	public Map map;
-	
+
 	Matrix4x4 GetTileMatrix(Vector2Int tile) {
 		Vector3 position = factoryMarker.TransformPoint(new Vector3(tile.x, 0f, tile.y));
 		Quaternion rotation = Quaternion.Euler(90f,0f,0f);
@@ -219,10 +227,10 @@ public class FactoryManager : MonoBehaviour {
 		botManager = GetComponent<BotManager>();
 		botManager.Init();
 	}
-	
-	void Update () {
-		if (Input.GetKey(KeyCode.Mouse0)) {
-			Vector3 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+
+	public void Update () {
+		if (Input.LeftMouseButtonPressedInput()) {
+			Vector3 mousePos = mainCam.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
 			mousePos = factoryMarker.InverseTransformPoint(mousePos);
 			Vector2Int tile = new Vector2Int(Mathf.FloorToInt(mousePos.x + .5f),Mathf.FloorToInt(mousePos.z + .5f));
 
