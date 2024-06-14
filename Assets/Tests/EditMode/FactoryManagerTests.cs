@@ -1,3 +1,4 @@
+using System.Linq;
 using FluentAssertions;
 using Moq;
 using NSubstitute;
@@ -82,5 +83,30 @@ public class FactoryManagerTests
             .Received(4)
             .TrySpawnBot(Arg.Any<Vector2Int>());
     }
+
+    [Test]
+    public void WhenLeftMouseButtonClickedSecondTime_ThenShouldSpawn1Bot()
+    {
+        //ARRANGE
+        int amountOfSpawnedBots = 0;
+        var botsMock = Substitute.For<IBotManager>();
+        var inputStub = Substitute.For<IInput>();
+        inputStub.LeftMouseButtonPressedInput().Returns(true);
+        
+        var factoryManager = new GameObject().AddComponent<FactoryManager>();
+        factoryManager.Construct(inputStub, botsMock);
+        
+        
+        //ACT
+        factoryManager.HandleInput();
+        amountOfSpawnedBots = botsMock.ReceivedCalls().Count();
+        factoryManager.HandleInput();
+
+        //ASSERT
+        botsMock
+            .Received(amountOfSpawnedBots+1)
+            .TrySpawnBot(Arg.Any<Vector2Int>());
+    }
+
 
 }
