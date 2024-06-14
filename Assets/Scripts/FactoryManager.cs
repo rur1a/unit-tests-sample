@@ -263,18 +263,19 @@ public class FactoryManager : MonoBehaviour
 		{
 			var tile = _input.MapTileUnderMouseCursor(factoryMarker);
 
-			if (currentTool == ToolType.SpawnAgents) {
-				if(_firstClick)
-					for (int i = 0; i < 3; i++) {
-						_botManager.TrySpawnBot(tile);
-					}
-				else 
-					_botManager.TrySpawnBot(tile);
-			} else {
+			if (currentTool == ToolType.SpawnAgents)
+				SpawnBots(tile, _firstClick ? 3 : 1);
+			else
 				EditTile(tile,currentTool,true);
-			}
 
 			_firstClick = false;
+		}
+
+		void SpawnBots(Vector2Int tile, int amount)
+		{
+			for (int i = 0; i < amount; i++) {
+				_botManager.TrySpawnBot(tile);
+			}
 		}
 	}
 }
