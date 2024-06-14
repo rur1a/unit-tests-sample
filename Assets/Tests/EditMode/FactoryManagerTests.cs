@@ -1,4 +1,6 @@
 using FluentAssertions;
+using Moq;
+using NSubstitute;
 using NUnit.Framework;
 using Tests.EditMode;
 using UnityEngine;
@@ -9,9 +11,11 @@ public class FactoryManagerTests
     public void WhenLeftMouseButtonClicked_ThenSpawn3Bots()
     {
         //ARRANGE
-        var factoryManager = new GameObject().AddComponent<FactoryManager>();
+        var fakeInput = new FakeInputWithLeftButtonPressed();
         var fakeBotManager = new FakeBotManager();
-        factoryManager.Construct(new InputWithLeftButtonPressed(), fakeBotManager);
+        
+        var factoryManager = new GameObject().AddComponent<FactoryManager>();
+        factoryManager.Construct(fakeInput, fakeBotManager);
 
         //ACT 
         factoryManager.HandleInput();
@@ -19,18 +23,42 @@ public class FactoryManagerTests
         //ASSERT
         fakeBotManager.SpawnBots.Should().Be(3);
     }
-}
-
-public class FakeBotManager : IBotManager
-{
-    public int SpawnBots { get; private set; }
-
-    public void Init()
+    
+    [Test]
+    public void WhenLeftMouseButtonClicked_ThenSpawn3Bots_Moq()
     {
+        //ARRANGE
+        var fakeInput = Mock.Of<IInput>(x=>x.LeftMouseButtonPressedInput() == true);
+        var fakeBotManager = new Mock<IBotManager>();
+        
+        var factoryManager = new GameObject().AddComponent<FactoryManager>();
+        factoryManager.Construct(fakeInput, fakeBotManager.Object);
+
+        //ACT 
+        factoryManager.HandleInput();
+
+        //ASSERT
+        fakeBotManager.Verify(
+            x=>x.TrySpawnBot(It.IsAny<Vector2Int>()),
+            Times.Exactly(3));
     }
 
-    public void TrySpawnBot(Vector2Int tile)
+    [Test]
+    public void WhenLeftMouseButtonClicked_ThenSpawn3Bots_NSubstitute()
     {
-        SpawnBots++;
+        //ARRANGE
+        var fakeInput = Substitute.For<IInput>();
+        fakeInput.LeftMouseButtonPressedInput().Returns(true);
+        var fakeBotManager = Substitute.For<IBotManager>();
+        
+        var factoryManager = new GameObject().AddComponent<FactoryManager>();
+        factoryManager.Construct(fakeInput, fakeBotManager);
+
+        //ACT 
+        factoryManager.HandleInput();
+
+        //ASSERT
+        fakeBotManager.Received(3).TrySpawnBot(Arg.Any<Vector2Int>());
     }
+
 }
