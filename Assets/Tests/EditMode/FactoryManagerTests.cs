@@ -9,21 +9,19 @@ public class FactoryManagerTests
     public void WhenLeftMouseButtonCLicked_ThenSpawn3Bots()
     {
         //ARRANGE
-        ServiceLocator.Configure(new InputWithLeftButtonPressed());
-        var gameObject = new GameObject();
-        var factoryManager = gameObject.AddComponent<FactoryManager>();
-        var botManager = gameObject.AddComponent<FakeBotManager>();
-        factoryManager.Awake();
+        var factoryManager = new GameObject().AddComponent<FactoryManager>();
+        var fakeBotManager = new FakeBotManager();
+        factoryManager.Construct(new InputWithLeftButtonPressed(), fakeBotManager);
 
         //ACT 
         factoryManager.Update();
 
         //ASSERT
-        botManager.SpawnBots.Should().Be(3);
+        fakeBotManager.SpawnBots.Should().Be(3);
     }
 }
 
-public class FakeBotManager : MonoBehaviour, IBotManager
+public class FakeBotManager : IBotManager
 {
     public int SpawnBots { get; private set; }
 

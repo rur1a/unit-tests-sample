@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class FactoryManager : MonoBehaviour {
-	private IInput Input => ServiceLocator.Input();
-	
+public class FactoryManager : MonoBehaviour
+{
+	private IInput _input;
+	private IBotManager _botManager;
+
 	public TextAsset mapData;
+
 
 	[Space(10)]
 	public Mesh wallMesh;
@@ -35,10 +38,10 @@ public class FactoryManager : MonoBehaviour {
 	List<ResourceSpawner> resourceSpawners;
 	List<Matrix4x4> resourceSpawnerMatrices;
 
+
 	[System.NonSerialized]
 	public Transform factoryMarker;
 
-	IBotManager botManager;
 	List<FlowField> flowFields;
 	int flowFieldTicker = 0;
 
@@ -164,7 +167,16 @@ public class FactoryManager : MonoBehaviour {
 		map.tiles[tile.x,tile.y] = newTile;
 	}
 
-	public void Awake () {
+	public void Construct(IInput input, IBotManager botManager)
+	{
+		_input = input;
+		_botManager = botManager;
+	}
+
+	public void Awake () 
+	{
+		Construct(new UnityInput(), GetComponent<BotManager>());
+		
 		int i, j;
 
 		mainCam = Camera.main;
@@ -224,19 +236,18 @@ public class FactoryManager : MonoBehaviour {
 			}
 		}
 
-		botManager = GetComponent<IBotManager>();
-		botManager.Init();
+		_botManager.Init();
 	}
 
 	public void Update () 
 	{
-		if (Input.LeftMouseButtonPressedInput())
+		if (_input.LeftMouseButtonPressedInput())
 		{
-			var tile = Input.MapTileUnderMouseCursor(factoryMarker);
+			var tile = _input.MapTileUnderMouseCursor(factoryMarker);
 
 			if (currentTool == ToolType.SpawnAgents) {
 				for (int i = 0; i < 3; i++) {
-					botManager.TrySpawnBot(tile);
+					_botManager.TrySpawnBot(tile);
 				}
 			} else {
 				EditTile(tile,currentTool,true);
