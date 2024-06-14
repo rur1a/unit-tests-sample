@@ -1,3 +1,4 @@
+using FluentAssertions;
 using NUnit.Framework;
 using Tests.EditMode;
 using UnityEngine;
@@ -9,11 +10,29 @@ public class FactoryManagerTests
     {
         //ARRANGE
         ServiceLocator.Configure(new InputWithLeftButtonPressed());
-        var factoryManager = new GameObject().AddComponent<FactoryManager>();
+        var gameObject = new GameObject();
+        var factoryManager = gameObject.AddComponent<FactoryManager>();
+        var botManager = gameObject.AddComponent<FakeBotManager>();
+        factoryManager.Awake();
 
         //ACT 
         factoryManager.Update();
 
         //ASSERT
+        botManager.SpawnBots.Should().Be(3);
+    }
+}
+
+public class FakeBotManager : MonoBehaviour, IBotManager
+{
+    public int SpawnBots { get; private set; }
+
+    public void Init()
+    {
+    }
+
+    public void TrySpawnBot(Vector2Int tile)
+    {
+        SpawnBots++;
     }
 }

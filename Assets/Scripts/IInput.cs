@@ -3,9 +3,5 @@
 public interface IInput
 {
     bool LeftMouseButtonPressedInput();
-}
-
-internal class UnityInput : IInput
-{
-    public bool LeftMouseButtonPressedInput() => Input.GetKey(KeyCode.Mouse0);
+    Vector2Int MapTileUnderMouseCursor(Transform marker);
 }

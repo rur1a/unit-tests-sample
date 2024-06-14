@@ -38,7 +38,7 @@ public class FactoryManager : MonoBehaviour {
 	[System.NonSerialized]
 	public Transform factoryMarker;
 
-	BotManager botManager;
+	IBotManager botManager;
 	List<FlowField> flowFields;
 	int flowFieldTicker = 0;
 
@@ -164,7 +164,7 @@ public class FactoryManager : MonoBehaviour {
 		map.tiles[tile.x,tile.y] = newTile;
 	}
 
-	void Awake () {
+	public void Awake () {
 		int i, j;
 
 		mainCam = Camera.main;
@@ -224,15 +224,15 @@ public class FactoryManager : MonoBehaviour {
 			}
 		}
 
-		botManager = GetComponent<BotManager>();
+		botManager = GetComponent<IBotManager>();
 		botManager.Init();
 	}
 
-	public void Update () {
-		if (Input.LeftMouseButtonPressedInput()) {
-			Vector3 mousePos = mainCam.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
-			mousePos = factoryMarker.InverseTransformPoint(mousePos);
-			Vector2Int tile = new Vector2Int(Mathf.FloorToInt(mousePos.x + .5f),Mathf.FloorToInt(mousePos.z + .5f));
+	public void Update () 
+	{
+		if (Input.LeftMouseButtonPressedInput())
+		{
+			var tile = Input.MapTileUnderMouseCursor(factoryMarker);
 
 			if (currentTool == ToolType.SpawnAgents) {
 				for (int i = 0; i < 3; i++) {
@@ -255,4 +255,5 @@ public class FactoryManager : MonoBehaviour {
 		Graphics.DrawMeshInstanced(wallMesh,0,crafterMaterial,crafterMatrices);
 		Graphics.DrawMeshInstanced(wallMesh,0,resourceSpawnerMaterial,resourceSpawnerMatrices);
 	}
+
 }

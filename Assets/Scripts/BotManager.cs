@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BotManager : MonoBehaviour {
+public class BotManager : MonoBehaviour, IBotManager
+{
 	public int maxBotCount = 2000;
 	[Space(10)]
 	public Mesh botMesh;
