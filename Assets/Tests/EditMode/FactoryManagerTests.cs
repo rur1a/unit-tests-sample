@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Moq;
 using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 using NUnit.Framework;
 using Tests.EditMode;
 using UnityEngine;
@@ -59,6 +60,27 @@ public class FactoryManagerTests
 
         //ASSERT
         fakeBotManager.Received(3).TrySpawnBot(Arg.Any<Vector2Int>());
+    }
+
+    [Test]
+    public void WhenLeftMouseButtonClickedTwice_ThenShouldSpawn4Bots()
+    {
+        //ARRANGE
+        var botsMock= Substitute.For<IBotManager>();
+        var inputStub = Substitute.For<IInput>();
+        inputStub.LeftMouseButtonPressedInput().Returns(true);
+        
+        var factoryManager = new GameObject().AddComponent<FactoryManager>();
+        factoryManager.Construct(inputStub, botsMock);
+        
+        //ACT
+        factoryManager.HandleInput();
+        factoryManager.HandleInput();
+
+        //ASSERT
+        botsMock
+            .Received(4)
+            .TrySpawnBot(Arg.Any<Vector2Int>());
     }
 
 }

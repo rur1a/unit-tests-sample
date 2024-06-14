@@ -5,6 +5,7 @@ public class FactoryManager : MonoBehaviour
 {
 	private IInput _input;
 	private IBotManager _botManager;
+	private bool _firstClick = true;
 
 	public TextAsset mapData;
 
@@ -263,12 +264,17 @@ public class FactoryManager : MonoBehaviour
 			var tile = _input.MapTileUnderMouseCursor(factoryMarker);
 
 			if (currentTool == ToolType.SpawnAgents) {
-				for (int i = 0; i < 3; i++) {
+				if(_firstClick)
+					for (int i = 0; i < 3; i++) {
+						_botManager.TrySpawnBot(tile);
+					}
+				else 
 					_botManager.TrySpawnBot(tile);
-				}
 			} else {
 				EditTile(tile,currentTool,true);
 			}
+
+			_firstClick = false;
 		}
 	}
 }
