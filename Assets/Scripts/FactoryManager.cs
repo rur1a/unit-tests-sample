@@ -173,7 +173,7 @@ public class FactoryManager : MonoBehaviour
 		_botManager = botManager;
 	}
 
-	public void Awake () 
+	private void Awake () 
 	{
 		Construct(new UnityInput(), GetComponent<BotManager>());
 		
@@ -239,20 +239,9 @@ public class FactoryManager : MonoBehaviour
 		_botManager.Init();
 	}
 
-	public void Update () 
+	private void Update () 
 	{
-		if (_input.LeftMouseButtonPressedInput())
-		{
-			var tile = _input.MapTileUnderMouseCursor(factoryMarker);
-
-			if (currentTool == ToolType.SpawnAgents) {
-				for (int i = 0; i < 3; i++) {
-					_botManager.TrySpawnBot(tile);
-				}
-			} else {
-				EditTile(tile,currentTool,true);
-			}
-		}
+		HandleInput();
 
 		flowFields[flowFieldTicker].Generate();
 		flowFieldTicker++;
@@ -267,4 +256,19 @@ public class FactoryManager : MonoBehaviour
 		Graphics.DrawMeshInstanced(wallMesh,0,resourceSpawnerMaterial,resourceSpawnerMatrices);
 	}
 
+	internal void HandleInput()
+	{
+		if (_input.LeftMouseButtonPressedInput())
+		{
+			var tile = _input.MapTileUnderMouseCursor(factoryMarker);
+
+			if (currentTool == ToolType.SpawnAgents) {
+				for (int i = 0; i < 3; i++) {
+					_botManager.TrySpawnBot(tile);
+				}
+			} else {
+				EditTile(tile,currentTool,true);
+			}
+		}
+	}
 }

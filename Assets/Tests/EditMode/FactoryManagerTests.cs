@@ -6,7 +6,7 @@ using UnityEngine;
 public class FactoryManagerTests
 {
     [Test]
-    public void WhenLeftMouseButtonCLicked_ThenSpawn3Bots()
+    public void WhenLeftMouseButtonClicked_ThenSpawn3Bots()
     {
         //ARRANGE
         var factoryManager = new GameObject().AddComponent<FactoryManager>();
@@ -14,7 +14,7 @@ public class FactoryManagerTests
         factoryManager.Construct(new InputWithLeftButtonPressed(), fakeBotManager);
 
         //ACT 
-        factoryManager.Update();
+        factoryManager.HandleInput();
 
         //ASSERT
         fakeBotManager.SpawnBots.Should().Be(3);
