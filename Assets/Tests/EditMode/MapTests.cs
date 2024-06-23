@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
-using NSubstitute;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.WSA;
 
 namespace Tests.EditMode
 {
@@ -35,24 +33,6 @@ namespace Tests.EditMode
                 .Where(tile => tile.onEdge && tile.code != WallCode)
                 .Select(tile => new { XY = (tile.x, tile.y), Code = tile.code });
             
-            edgeTiles
-                .Should()
-                .BeEmpty();
-        }
-        
-        [Test]
-        public void EdgeTilesShouldBeWalls()
-        {
-            var map = @"
-                        1,1,1,1
-                        1,0,0,1
-                        1,0,X,1
-                        1,1,1,1
-                       ";
-
-            var edgeTiles = ParseMap(map)
-                .Where(tile => tile.onEdge && tile.code != WallCode)
-                .Select(tile => new { XY = (tile.x, tile.y), Code = tile.code });
             edgeTiles
                 .Should()
                 .BeEmpty();
