@@ -13,12 +13,12 @@ namespace Tests.EditMode
     public class CodeConventionsTests
     {
         [Test]
-        public void AllClassesShouldBeInNamespaces()
+        public void AllTypesShouldBeInNamespaces()
         {
             var classesNotInNamespaces = 
                 from path in CSharpAssetPaths()
                 let source = AssetDatabase.LoadAssetAtPath<TextAsset>(path)
-                from @class in ClassesNotInNamespace(source.text)
+                from @class in TypesNotInNamespace(source.text)
                 select (@class, path);
             
             classesNotInNamespaces.Should().BeEmpty();
@@ -30,18 +30,24 @@ namespace Tests.EditMode
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Where(path => Path.GetExtension(path) == ".cs");
 
-        private IEnumerable<string> ClassesNotInNamespace(string source) =>
+        private IEnumerable<string> TypesNotInNamespace(string source) =>
             CSharpSyntaxTree
                 .ParseText(source)
                 .GetRoot()
                 .DescendantNodesAndSelf()
-                .OfType<ClassDeclarationSyntax>()
+                .Where(type =>
+                    type is ClassDeclarationSyntax 
+                        or StructDeclarationSyntax
+                        or EnumDeclarationSyntax
+                        or InterfaceDeclarationSyntax
+                    )
+                .Select(type => type as BaseTypeDeclarationSyntax)
                 .Where(NotInNamespace)
                 .Select(@class => @class.Identifier.Text);
 
-        private bool NotInNamespace(ClassDeclarationSyntax node) => !InNamespace(node);
+        private bool NotInNamespace(BaseTypeDeclarationSyntax node) => !InNamespace(node);
 
-        private bool InNamespace(ClassDeclarationSyntax node) =>
+        private bool InNamespace(BaseTypeDeclarationSyntax node) =>
             node
                 .Ancestors()
                 .OfType<NamespaceDeclarationSyntax>()
