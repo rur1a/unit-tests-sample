@@ -6,20 +6,38 @@ using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.WSA;
 
 namespace Tests.EditMode
 {
     public class MapTests
     {
-        [Test]
-        public void AtLeastOneMapExist()
-        {
-            var maps = AssetDatabase.FindAssets("t:TextAsset", new[] { "Assets/Map Data" })
+        private const char WallCode = '1';
+        private static IEnumerable<string> MapPaths =>
+            AssetDatabase.FindAssets("t:TextAsset", new[] { "Assets/Map Data" })
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Where(path => Path.GetExtension(path) == ".csv");
 
+        [Test]
+        public void AtLeastOneMapExist()
+        {
+            var maps = MapPaths;
             maps.Should().NotBeEmpty();
+        }
+
+        [TestCaseSource(nameof(MapPaths))]
+        public void AllEdgeTilesAreWalls(string mapPath)
+        {
+            var map = AssetDatabase.LoadAssetAtPath<TextAsset>(mapPath).text;
+            
+            var edgeTiles = ParseMap(map)
+                .Where(tile => tile.onEdge && tile.code != WallCode)
+                .Select(tile => new { XY = (tile.x, tile.y), Code = tile.code });
+            
+            edgeTiles
+                .Should()
+                .BeEmpty();
         }
         
         [Test]
@@ -31,10 +49,9 @@ namespace Tests.EditMode
                         1,0,X,1
                         1,1,1,1
                        ";
-            var wallCode = '1';
 
             var edgeTiles = ParseMap(map)
-                .Where(tile => tile.onEdge && tile.code != wallCode)
+                .Where(tile => tile.onEdge && tile.code != WallCode)
                 .Select(tile => new { XY = (tile.x, tile.y), Code = tile.code });
             edgeTiles
                 .Should()
