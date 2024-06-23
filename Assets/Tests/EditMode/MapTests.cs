@@ -31,13 +31,24 @@ namespace Tests.EditMode
             
             allMaps.Should().BeEquivalentTo(allSymbols);
         }
-        
-        
+
         [Test]
         public void AtLeastOneMapExist()
         {
             var maps = MapPaths;
             maps.Should().NotBeEmpty();
+        }
+
+        [TestCaseSource(nameof(MapPaths))]
+        public void MapsHaveEmptyTiles(string mapPath)
+        {
+            var notWallSymbols =
+                AssetDatabase.LoadAssetAtPath<TextAsset>(mapPath)
+                    .text
+                    .Distinct()
+                    .Except(new[] { WallCode });
+
+            notWallSymbols.Should().NotBeEmpty();
         }
 
         [TestCaseSource(nameof(MapPaths))]
