@@ -1,15 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine.WSA;
 
 namespace Tests.EditMode
 {
     public class MapTests
     {
+        [Test]
+        public void AtLeastOneMapExist()
+        {
+            var maps = AssetDatabase.FindAssets("t:TextAsset", new[] { "Assets/Map Data" })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(path => Path.GetExtension(path) == ".csv");
+
+            maps.Should().NotBeEmpty();
+        }
+        
         [Test]
         public void EdgeTilesShouldBeWalls()
         {
