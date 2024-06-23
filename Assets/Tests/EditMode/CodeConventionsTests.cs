@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
@@ -19,17 +20,17 @@ namespace Tests.EditMode
                     .FindAssets("t:TextAsset", new[] { "Assets" })
                     .Select(AssetDatabase.GUIDToAssetPath)
                     .Where(path => Path.GetExtension(path) == ".cs")
-                    .Select(AssetDatabase.LoadAssetAtPath<TextAsset>);
-
-
-            foreach (var cs in sources)
-                CSharpSyntaxTree
-                        .ParseText(cs.text)
-                        .GetRoot()
-                        .DescendantNodesAndSelf()
-                        .OfType<ClassDeclarationSyntax>()
-                        .Where(NotInNamespace)
-                        .Should().BeEmpty();
+                    .Select(AssetDatabase.LoadAssetAtPath<TextAsset>)
+                    .SelectMany(source =>
+                        CSharpSyntaxTree
+                            .ParseText(source.text)
+                            .GetRoot()
+                            .DescendantNodesAndSelf()
+                            .OfType<ClassDeclarationSyntax>()
+                            .Where(NotInNamespace)
+                            .Select(@class => @class.Identifier.Text));
+            
+            sources.Should().BeEmpty();
         }
 
         private bool NotInNamespace(ClassDeclarationSyntax node) => !InNamespace(node);
