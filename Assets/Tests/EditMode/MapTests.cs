@@ -78,7 +78,7 @@ namespace Tests.EditMode
                 lineIndex,
                 tileIndex,
                 tile.Single(),
-                lineOnEdge && (tileIndex == 0 || tileIndex == tiles.Length - 1)));
+                lineOnEdge || tileIndex == 0 || tileIndex == tiles.Length - 1));
         }
     }
 }
