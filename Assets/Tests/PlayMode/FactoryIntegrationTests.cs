@@ -37,27 +37,39 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator When1BotSpawned_AndTimePasses_ThenBotMovesClockwise()
+        public IEnumerator WhenTimePasses_ThenSpawnedBotsMoveClockwise()
         {
             //ARRANGE
             var waitFor1Second = new WaitForSeconds(1);
             var botManager = Object.FindObjectOfType<BotManager>();
-            botManager.TrySpawnBot(new Vector2Int(1,25));
-
-            //ACT
-            var botAngles = new List<float>();
+            
             for(int i =0; i<10; i++)
+                botManager.TrySpawnBot(new Vector2Int(1,25));
+
+            // ACT
+            var botsAngles = new List<List<float>>();
+            for (int i = 0; i < 10; i++)
+            {
+                botsAngles.Add(new List<float>());
+            }
+
+            for (int i = 0; i < 10; i++)
             {
                 yield return waitFor1Second;
                 var centerPosition = new Vector2(15, 15);
-                var botRelativePosition = botManager.Bots[0].position - centerPosition;
-                botAngles.Add(Vector2.SignedAngle(botRelativePosition, Vector2.zero));
+
+                for (int j = 0; j < 10; j++)
+                {
+                    var botRelativePosition = botManager.Bots[j].position - centerPosition;
+                    botsAngles[j].Add(Vector2.SignedAngle(botRelativePosition, Vector2.zero));
+                }
             }
 
-            //ASSERT
-            botAngles.Should().BeInAscendingOrder();
+            // ASSERT
+            foreach (var botAngles in botsAngles)
+            {
+                botAngles.Should().BeInAscendingOrder();
+            }
         }
-
-
     }
 }
