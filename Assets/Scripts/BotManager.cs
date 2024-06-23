@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BotManager : MonoBehaviour, IBotManager
 {
+	internal List<FactoryBot> Bots => bots;
+	
 	public int maxBotCount = 2000;
 	[Space(10)]
 	public Mesh botMesh;
