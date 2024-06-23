@@ -11,7 +11,78 @@ using UnityEngine;
 namespace Tests.EditMode
 {
     public class CodeConventionsTests
-    {   
+    {
+        [Test]
+        public void AllCodeShouldNotContainUnderscore()
+        {
+            var codeWithUnderscore =
+                from path in CSharpAssetPaths()
+                let source = AssetDatabase.LoadAssetAtPath<TextAsset>(path)
+                from code in CodeWithoutUnderscore(source.text)
+                select (code, path);
+            codeWithUnderscore.Should().BeEmpty();
+        }
+
+        private IEnumerable<string> CodeWithoutUnderscore(string text)
+        {
+            var tree = CSharpSyntaxTree.ParseText(text);
+            var root = tree.GetRoot();
+            
+            foreach (var node in root.DescendantNodes())
+            {
+                switch (node)
+                {
+                    case ClassDeclarationSyntax classNode:
+                        if (classNode.Identifier.Text.Contains("_"))
+                            yield return $"Class: {classNode.Identifier.Text}";
+                        break;
+                    case MethodDeclarationSyntax methodNode:
+                        if (methodNode.Identifier.Text.Contains("_"))
+                            yield return $"Method: {methodNode.Identifier.Text}";
+                        break;
+                    case NamespaceDeclarationSyntax namespaceNode:
+                        if (namespaceNode.Name.ToString().Contains("_"))
+                            yield return $"Namespace: {namespaceNode.Name}";
+                        break;
+                    case FieldDeclarationSyntax fieldNode:
+                        foreach (var variable in fieldNode.Declaration.Variables)
+                        {
+                            if (variable.Identifier.Text.Contains("_"))
+                                yield return $"Field: {variable.Identifier.Text}";
+                        }
+                        break;
+                    case PropertyDeclarationSyntax propertyNode:
+                        if (propertyNode.Identifier.Text.Contains("_"))
+                            yield return $"Property: {propertyNode.Identifier.Text}";
+                        break;
+                    case VariableDeclaratorSyntax variableNode:
+                        if (variableNode.Identifier.Text.Contains("_"))
+                            yield return $"Variable: {variableNode.Identifier.Text}";
+                        break;
+                    case ParameterSyntax parameterNode:
+                        if (parameterNode.Identifier.Text.Contains("_"))
+                            yield return $"Parameter: {parameterNode.Identifier.Text}";
+                        break;
+                    case InterfaceDeclarationSyntax interfaceNode:
+                        if (interfaceNode.Identifier.Text.Contains("_"))
+                            yield return $"Interface: {interfaceNode.Identifier.Text}";
+                        break;
+                    case StructDeclarationSyntax structNode:
+                        if (structNode.Identifier.Text.Contains("_"))
+                            yield return $"Struct: {structNode.Identifier.Text}";
+                        break;
+                    case EnumDeclarationSyntax enumNode:
+                        if (enumNode.Identifier.Text.Contains("_"))
+                            yield return $"Enum: {enumNode.Identifier.Text}";
+                        break;
+                    case EnumMemberDeclarationSyntax enumMemberNode:
+                        if (enumMemberNode.Identifier.Text.Contains("_"))
+                            yield return $"Enum Member: {enumMemberNode.Identifier.Text}";
+                        break;
+                        }
+            }
+        }
+
         [Test]
         public void AllClassesShouldUseOnlySpaces()
         { 
