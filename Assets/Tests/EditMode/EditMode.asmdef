@@ -16,7 +16,9 @@
         "nunit.framework.dll",
         "FluentAssertions.dll",
         "Moq.dll",
-        "NSubstitute.dll"
+        "NSubstitute.dll",
+        "Microsoft.CodeAnalysis.CSharp.dll",
+        "Microsoft.CodeAnalysis.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
