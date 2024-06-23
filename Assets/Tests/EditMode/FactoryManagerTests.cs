@@ -92,11 +92,11 @@ namespace Tests.EditMode
             var botsMock = Substitute.For<IBotManager>();
             var inputStub = Substitute.For<IInput>();
             inputStub.LeftMouseButtonPressedInput().Returns(true);
-        
+
             var factoryManager = new GameObject().AddComponent<FactoryManager>();
             factoryManager.Construct(inputStub, botsMock);
-        
-        
+
+
             //ACT
             factoryManager.HandleInput();
             amountOfSpawnedBots = botsMock.ReceivedCalls().Count();
@@ -104,10 +104,8 @@ namespace Tests.EditMode
 
             //ASSERT
             botsMock
-                .Received(amountOfSpawnedBots+1)
+                .Received(amountOfSpawnedBots + 1)
                 .TrySpawnBot(Arg.Any<Vector2Int>());
         }
-
-
     }
 }
