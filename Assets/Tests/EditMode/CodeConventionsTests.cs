@@ -11,7 +11,30 @@ using UnityEngine;
 namespace Tests.EditMode
 {
     public class CodeConventionsTests
-    {
+    {   
+        [Test]
+        public void AllClassesShouldUseOnlySpaces()
+        { 
+            var classesWithSpaces = 
+                from path in CSharpAssetPaths()
+                let source = AssetDatabase.LoadAssetAtPath<TextAsset>(path)
+                let linesWithSpaces = GetLinesWithTabs(source.text)
+                where linesWithSpaces.Any()
+                select (path, linesWithSpaces);
+    
+            classesWithSpaces.Should().BeEmpty();
+        }
+
+        private IEnumerable<int> GetLinesWithTabs(string source)
+        {
+            var lines = source.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].Contains("\t"))
+                    yield return i + 1;
+            }
+        }
+        
         [Test]
         public void AllTypesShouldBeInNamespaces()
         {
