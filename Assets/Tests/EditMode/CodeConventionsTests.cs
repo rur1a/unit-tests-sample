@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
+using UnityEditor;
+using UnityEngine;
 
 namespace Tests.EditMode
 {
@@ -11,17 +14,22 @@ namespace Tests.EditMode
         [Test]
         public void AllClassesShouldBeInNamespaces()
         {
-            const string sourceCode = "namespace N {class C {}}";
+            var sources =
+                AssetDatabase
+                    .FindAssets("t:TextAsset", new[] { "Assets" })
+                    .Select(AssetDatabase.GUIDToAssetPath)
+                    .Where(path => Path.GetExtension(path) == ".cs")
+                    .Select(AssetDatabase.LoadAssetAtPath<TextAsset>);
 
-            var classesNotInNamespaces =
+
+            foreach (var cs in sources)
                 CSharpSyntaxTree
-                    .ParseText(sourceCode)
-                    .GetRoot()
-                    .DescendantNodesAndSelf()
-                    .OfType<ClassDeclarationSyntax>()
-                    .Where(NotInNamespace);
-
-            classesNotInNamespaces.Should().BeEmpty();
+                        .ParseText(cs.text)
+                        .GetRoot()
+                        .DescendantNodesAndSelf()
+                        .OfType<ClassDeclarationSyntax>()
+                        .Where(NotInNamespace)
+                        .Should().BeEmpty();
         }
 
         private bool NotInNamespace(ClassDeclarationSyntax node) => !InNamespace(node);
