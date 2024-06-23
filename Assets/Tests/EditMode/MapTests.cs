@@ -18,6 +18,22 @@ namespace Tests.EditMode
                 .Where(path => Path.GetExtension(path) == ".csv");
 
         [Test]
+        public void AllTileTypesUsed()
+        {
+            var allSymbols = string.Concat("01XZ=-".OrderBy(c => c));
+            var allMaps = string.Concat(MapPaths
+                .Aggregate(
+                    string.Empty, 
+                    (current, mapPath) => current + AssetDatabase.LoadAssetAtPath<TextAsset>(mapPath).text)
+                .Distinct()
+                .Except(new[]{',', '\r', '\n'})
+                .OrderBy(c=>c));
+            
+            allMaps.Should().BeEquivalentTo(allSymbols);
+        }
+        
+        
+        [Test]
         public void AtLeastOneMapExist()
         {
             var maps = MapPaths;
